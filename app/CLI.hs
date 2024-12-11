@@ -4,7 +4,6 @@ import Options.Applicative
 
 data Options = MkOptions 
   { fileInput :: String
-  , extType :: String 
   , output :: Maybe String
   , doNotIncludePrelude :: Bool
   }
@@ -14,14 +13,6 @@ options = MkOptions
   <$> argument str
     ( metavar "FILE"
     <> help "The input file"
-    )
-  <*> strOption
-    ( long "ext-type"
-    <> short 'e'
-    <> metavar "EXT_TYPE"
-    <> help "The type of the output file (native, or js)"
-    <> showDefault
-    <> value "js"
     )
   <*> optional (strOption
     ( long "output"
