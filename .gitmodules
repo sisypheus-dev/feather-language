@@ -1,6 +1,3 @@
-[submodule "runtime"]
-	path = runtime
-	url = https://github.com/plume-lang/runtime
 [submodule "standard"]
 	path = standard
 	url = https://github.com/plume-lang/standard.git
