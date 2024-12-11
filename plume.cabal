@@ -3,57 +3,61 @@ name:            plume
 version:         0.7.2
 license:         MIT
 license-file:    LICENSE
-maintainer:      contact@sisypheus.dev
-author:          sisypheus
+maintainer:      contact@thomas-vergne.fr
+author:          Thomas Vergne
 category:        Language
 build-type:      Simple
 extra-doc-files: CHANGELOG.md
 
 library
   exposed-modules:
+    -- Generic modules that are not specific to Plume but are used in the compiler
     Control.Monad.Exception
     Control.Monad.IO
     Control.Monad.Parser
     GHC.Records
-    Plume.Compiler.Bytecode.Assembler
-    Plume.Compiler.Bytecode.Label
-    Plume.Compiler.Bytecode.Serialize
-    Plume.Compiler.Bytecode.Syntax
+
+    -- Plume closure conversion modules
     Plume.Compiler.ClosureConversion.Conversion
     Plume.Compiler.ClosureConversion.Free
     Plume.Compiler.ClosureConversion.Syntax
+
+    -- Plume desugaring modules
     Plume.Compiler.Desugaring.Desugar
     Plume.Compiler.Desugaring.Modules.ANF
     Plume.Compiler.Desugaring.Modules.Switch
     Plume.Compiler.Desugaring.Monad
     Plume.Compiler.Desugaring.Syntax
+
+    -- Plume JavaScript code generation modules
     Plume.Compiler.Javascript.Syntax
     Plume.Compiler.Javascript.Translate
-    Plume.Compiler.LLIR.Assembler
-    Plume.Compiler.LLIR.Free
-    Plume.Compiler.LLIR.Syntax
-    Plume.Compiler.SSA
-    Plume.Compiler.SSA.Bundler
-    Plume.Compiler.SSA.DeadCode
+
+    -- Plume type erasure modules
     Plume.Compiler.TypeErasure.DynamicDispatch.Dispatch
     Plume.Compiler.TypeErasure.DynamicDispatch.RTTI
     Plume.Compiler.TypeErasure.EraseType
     Plume.Compiler.TypeErasure.Syntax
+
+    -- Some transformation modules used to simplify and desugar the code
     Plume.Syntax.Abstract
     Plume.Syntax.Blocks
     Plume.Syntax.MatchRemoval
     Plume.Syntax.ArgumentDeducer
+
+    -- Plume common modules used in syntax for instance
     Plume.Syntax.Common
     Plume.Syntax.Common.Annotation
-    Plume.Syntax.Common.Internal.Pretty
     Plume.Syntax.Common.Literal
     Plume.Syntax.Common.Pattern
     Plume.Syntax.Common.Type
+
+    -- Plume concrete syntax modules
     Plume.Syntax.Concrete
     Plume.Syntax.Concrete.Expression
-    Plume.Syntax.Concrete.Internal.Pretty
     Plume.Syntax.Concrete.Internal.Show
-    Plume.Syntax.Internal.Pretty.ANSI
+
+    -- Plume parser
     Plume.Syntax.Parser
     Plume.Syntax.Parser.Lexer
     Plume.Syntax.Parser.Modules.Literal
@@ -64,13 +68,17 @@ library
     Plume.Syntax.Parser.Modules.Type
     Plume.Syntax.Parser.Parser
     Plume.Syntax.Parser.Requires
+
+    -- Plume require checker
     Plume.Syntax.Require.Monad
     Plume.Syntax.Require.Resolution
+
+    -- Plume module resolver
     Plume.Syntax.Translation.ConcreteToAbstract
-    Plume.Syntax.Translation.ConcreteToAbstract.MacroResolver
     Plume.Syntax.Translation.ConcreteToAbstract.Require
     Plume.Syntax.Translation.Generics
-    Plume.Syntax.Translation.Substitution
+
+    -- Plume typechecker
     Plume.TypeChecker.Checker
     Plume.TypeChecker.Checker.Application
     Plume.TypeChecker.Checker.Closure
@@ -94,6 +102,8 @@ library
     Plume.TypeChecker.Monad.State
     Plume.TypeChecker.Monad.Type
     Plume.TypeChecker.TLIR
+
+    -- Some utility modules used to print pretty error messages
     System.IO.Color
     System.IO.Pretty
 
