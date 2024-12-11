@@ -4,8 +4,7 @@ module Control.Monad.Parser (
   FileContent,
   ParsingError,
   parse,
-  parseTest',
-  extensionType
+  parseTest'
 ) where
 
 import Control.Monad.IO as IO
@@ -26,10 +25,6 @@ parse
   -> IO (Either ParsingError a)
 parse p filePath fileContent = do
   runParserT p filePath fileContent
-
-{-# NOINLINE extensionType #-}
-extensionType :: IORef Text
-extensionType = IO.unsafePerformIO $ newIORef "js"
 
 parseTest' :: Parser a -> FileContent -> IO (Either ParsingError a)
 parseTest' p = parse (p <* eof) "<test>"

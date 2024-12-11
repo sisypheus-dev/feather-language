@@ -97,7 +97,7 @@ data Expression t f
     }
   | EReturn (Expression t f)
   | ETypeExtension [PlumeGeneric] (Annotation [t]) (Maybe Text) [ExtensionMember t f]
-  | ENativeFunction Text Text [Text] t LibraryType IsStandard
+  | ENativeFunction Text Text [Text] t IsStandard
   | ETypeAlias (Annotation [Text]) t
   | EVariableDeclare [PlumeGeneric] Text (f t)
   | EInstanceDeclare [PlumeGeneric] Text [t]
@@ -150,7 +150,7 @@ instance (Eq t, Eq (f t)) => Eq (Expression t f) where
   EReturn x == EReturn y = x == y
   EInterface x xs ys d == EInterface x' xs' ys' d' = x == x' && xs == xs' && ys == ys' && d == d'
   ETypeExtension xs x t ys == ETypeExtension xs' x' t' ys' = xs == xs' && x == x' && ys == ys' && t == t'
-  ENativeFunction x y xs z t isStd == ENativeFunction x' y' xs' z' t' isStd' = x == x' && y == y' && xs == xs' && z == z' && t == t' && isStd == isStd'
+  ENativeFunction x y xs z isStd == ENativeFunction x' y' xs' z' isStd' = x == x' && y == y' && xs == xs' && z == z' && isStd == isStd'
   EVariableDeclare xs x t == EVariableDeclare xs' x' t' = xs == xs' && x == x' && t == t'
   ELocated x _ == ELocated y _ = x == y
   ELocated x _ == y = x == y
@@ -185,7 +185,7 @@ instance (Show t, Show (f t)) => Show (Expression t f) where
   show (EInterface x xs ys d) = "interface " <> show x <> " " <> show xs <> " " <> show ys <> " " <> maybe "" (\(x', y) -> "deduct " <> toString x' <> " " <> toString y) d
   show (EReturn x) = "return " <> show x
   show (ETypeExtension xs x t ys) = "extend " <> show xs <> " " <> show x <> " " <> maybe "" ((" as " <>) . toString) t <> " " <> show ys
-  show (ENativeFunction x y xs _ _ _) = "native " <> toString x <> " " <> toString y <> " " <> show xs
+  show (ENativeFunction x y xs _ _) = "native " <> toString x <> " " <> toString y <> " " <> show xs
   show (ETypeAlias x t) = "type " <> show x <> " = " <> show t
   show (EVariableDeclare xs x t) = "declare " <> show xs <> " " <> toString x <> " " <> show t
   show (EAwait x) = "await " <> show x

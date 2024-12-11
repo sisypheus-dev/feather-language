@@ -135,7 +135,7 @@ concreteToAbstract (CST.ETypeExtension g ann var ems) = do
   ems' <-
     fmap flat . sequence <$> mapM concreteToAbstractExtensionMember ems
   transRet $ AST.ETypeExtension g ann' var <$> ems'
-concreteToAbstract (CST.ENativeFunction fp n gens t libTy _) = do
+concreteToAbstract (CST.ENativeFunction fp n gens t _) = do
   sc <- readIORef mode
 
   t' <- transformType t
@@ -146,14 +146,14 @@ concreteToAbstract (CST.ENativeFunction fp n gens t libTy _) = do
 
   -- Native function resolution is kind the same as require resolution
   -- except we do not parse everything.
-  let strModName = fromString $ toString fp -<.> sharedLibExt libTy
+  let strModName = fromString $ toString fp -<.> "js"
   let (ty, path)
         | "std:" `T.isPrefixOf` fp = 
             (Just "standard" :: Maybe Text, T.drop 4 strModName)
         | "mod:" `T.isPrefixOf` fp = 
             (Just "module", T.drop 4 strModName)
         | otherwise = 
-            (Nothing, fromString $ basePath </> toString fp -<.> sharedLibExt libTy)
+            (Nothing, fromString $ basePath </> toString fp -<.> "js")
 
   let isPathPrefix :: FilePath -> FilePath -> Bool
       isPathPrefix p1 p2 = normalise p1 `List.isPrefixOf` normalise p2
@@ -180,7 +180,7 @@ concreteToAbstract (CST.ENativeFunction fp n gens t libTy _) = do
         Nothing -> return path
     _ -> return path
 
-  transRet . Right $ AST.ENativeFunction newPath n gens t' libTy (sc' <|> ty)
+  transRet . Right $ AST.ENativeFunction newPath n gens t' (sc' <|> ty)
 concreteToAbstract (CST.EList es) = do
   -- Lists can be composed of spread elements, so we need to flatten
   -- the list of expressions into a single expression.

@@ -281,28 +281,18 @@ eCaseClosure = do
 
 eClosureAsync:: P.Parser CST.Expression
 eClosureAsync = do
-  extTy <- readIORef P.extensionType
-
   void $ L.reserved "async"
   void $ L.reserved "fn"
   args <- L.parens $ mutArg `P.sepBy` L.comma
   retTy <- P.optional $ L.symbol ":" *> Typ.tType
   body <- L.symbol "=>" *> parseExpression <|> eBlock
 
-  let cl
-        | extTy == "native" = do
-          let threadBody = CST.EApplication (CST.EVariable "create_thread" Nothing) [CST.EClosure [] Nothing body False]
-
-          CST.EClosure args retTy threadBody False
-
-        | otherwise = CST.EClosure args retTy body True
+  let cl = CST.EClosure args retTy body True
 
   return cl
 
 eClosureAsyncCase :: P.Parser CST.Expression
 eClosureAsyncCase = do
-  extTy <- readIORef P.extensionType
-
   void $ L.reserved "async"
   void $ L.reserved "fn"
   void $ L.reserved "case"
@@ -316,13 +306,7 @@ eClosureAsyncCase = do
 
   let switch = CST.ESwitch (CST.EVariable fnCaseArg Nothing) [(pat, body)]
 
-  let cl
-        | extTy == "native" = do
-          let threadBody = CST.EApplication (CST.EVariable "create_thread" Nothing) [CST.EClosure [] Nothing switch False]
-
-          CST.EClosure [fnCaseArg Cmm.:@: Nothing] retTy threadBody False
-
-        | otherwise = CST.EClosure [fnCaseArg Cmm.:@: Nothing] retTy switch True
+  let cl = CST.EClosure [fnCaseArg Cmm.:@: Nothing] retTy switch True
 
   return cl
 
@@ -530,8 +514,6 @@ sFunction = do
 
 sAsyncFunction :: P.Parser CST.Expression
 sAsyncFunction = do
-  extTy <- readIORef P.extensionType
-
   void $ L.reserved "async"
   void $ L.reserved "fn"
   name <- L.identifier <|> L.parens L.operator
@@ -540,11 +522,7 @@ sAsyncFunction = do
   retTy <- P.optional $ L.symbol ":" *> Typ.tType
   body <- L.symbol "=>" *> parseExpression <|> eBlock
 
-  let threadBody
-        | extTy == "native" =  CST.EApplication (CST.EVariable "create_thread" Nothing) [CST.EClosure [] Nothing body False]
-        | otherwise = body
-
-  let cl = CST.EClosure args retTy threadBody (extTy == "js")
+  let cl = CST.EClosure args retTy body True
 
   return $
     CST.EDeclaration
@@ -699,15 +677,11 @@ tInterface = do
 tNative :: P.Parser [CST.Expression]
 tNative = do
   void $ L.reserved "native"
-  libTy <- ((:[]) <$> Lit.stringLiteral) <|> L.parens (Lit.stringLiteral `P.sepBy1` L.comma)
-  extTy <- readIORef P.extensionType
 
   path <- Lit.stringLiteral
   xs <- P.choice [nativeGroup path, nativeOne path]
 
-  if extTy `elem` libTy
-    then return (map (\p -> p extTy Nothing) xs)
-    else return []
+  pure $ map (\ext -> ext Nothing) xs
   where
     nativeGroup p = L.braces (P.many (parseNative p))
     nativeOne p = (: []) <$> parseNative p

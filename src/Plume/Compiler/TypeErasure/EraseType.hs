@@ -67,7 +67,7 @@ eraseType (Pre.EDeclaration _ (Annotation name _ _) (Pre.EClosure args _ body is
 eraseType (Pre.EVariableDeclare _ name t : xs) = do
   modifyIORef' program (<> [Post.UPDeclare name (arity t)])
   eraseType xs
-eraseType (Pre.ENativeFunction fp n _ (args :->: _) _ isStd : xs) = do
+eraseType (Pre.ENativeFunction fp n _ (args :->: _) isStd : xs) = do
   modifyIORef'
     program
     (<> [Post.UPNativeFunction fp n (length args) isStd])

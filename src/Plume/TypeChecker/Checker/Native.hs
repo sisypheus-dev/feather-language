@@ -9,7 +9,7 @@ import Prelude hiding (gets)
 import qualified Data.Set as Set
 
 synthNative :: Infer
-synthNative (Pre.ENativeFunction fp name generics ty st isStd) = do
+synthNative (Pre.ENativeFunction fp name generics ty isStd) = do
   nats <- gets natives
   case Map.lookup name nats of
     Just (sch, pos) -> throwRaw (pos, DuplicateNative name sch)
@@ -27,7 +27,7 @@ synthNative (Pre.ENativeFunction fp name generics ty st isStd) = do
   pure
     ( TUnit
     , []
-    , pure $ Post.ENativeFunction fp name gens convertedTy st isStd
+    , pure $ Post.ENativeFunction fp name gens convertedTy isStd
     , False
     )
 synthNative _ = throw $ CompilerError "Only native functions are supported"
