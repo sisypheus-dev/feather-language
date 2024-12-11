@@ -142,8 +142,6 @@ loadModule :: M.MonadResolution m => FilePath -> Text -> m ([(Text, Bool)], SL.S
 loadModule path contentAsText = do
   imports <- liftIO $ parse P.getPaths path contentAsText
 
-  ext_type <- readIORef extensionType
-
   case imports of
     Left e -> liftIO $ do
       parseError e path contentAsText
@@ -151,7 +149,7 @@ loadModule path contentAsText = do
 
     Right modules -> do
       isStd <- isStandardPath path
-      let prelude = if ext_type == "js" then "std:prelude-js" else "std:prelude"
+      let prelude = "std:prelude"
       let modules' = if not isStd then (prelude, Nothing, False) : modules else modules
       
       operators <- liftIO $ parse P.parseOperators path contentAsText

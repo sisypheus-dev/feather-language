@@ -8,7 +8,6 @@ import Data.List qualified as List
 import Plume.Syntax.Abstract qualified as AST
 import Plume.Syntax.Common qualified as Common
 import Plume.Syntax.Concrete qualified as CST
-import Plume.Syntax.Translation.ConcreteToAbstract.MacroResolver
 import Plume.Syntax.Translation.ConcreteToAbstract.Require
 import Plume.Syntax.Translation.Generics
 import System.Directory
@@ -45,14 +44,6 @@ concreteToAbstract
   -> TranslatorReader Error AST.Expression
 concreteToAbstract (CST.ELiteral l) = transRet . Right $ AST.ELiteral l
 concreteToAbstract (CST.EPublic e) = concreteToAbstract e
-concreteToAbstract m@(CST.EMacro {}) =
-  convertMacro concreteToAbstract m
-concreteToAbstract m@(CST.EMacroFunction {}) =
-  convertMacro concreteToAbstract m
-concreteToAbstract m@(CST.EMacroVariable _) =
-  convertMacro concreteToAbstract m
-concreteToAbstract m@(CST.EMacroApplication {}) =
-  convertMacro concreteToAbstract m
 concreteToAbstract (CST.EVariable n t) = transRet . Right $ AST.EVariable n t
 concreteToAbstract (CST.EApplication (CST.EProperty p e) args) = do
   e' <- shouldBeAlone <$> concreteToAbstract e
@@ -104,9 +95,7 @@ concreteToAbstract (CST.EBlock es) = do
   -- the list of expressions into a single expression.
   es' <-
     fmap flat . sequence <$> do
-      oldMacroSt <- readIORef macroState
       res <- mapM concreteToAbstract es
-      writeIORef macroState oldMacroSt
       return res
   transRet $ AST.EBlock <$> es'
 concreteToAbstract r@(CST.ERequire _) = do

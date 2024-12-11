@@ -29,7 +29,7 @@ parse p filePath fileContent = do
 
 {-# NOINLINE extensionType #-}
 extensionType :: IORef Text
-extensionType = IO.unsafePerformIO $ newIORef "native"
+extensionType = IO.unsafePerformIO $ newIORef "js"
 
 parseTest' :: Parser a -> FileContent -> IO (Either ParsingError a)
 parseTest' p = parse (p <* eof) "<test>"

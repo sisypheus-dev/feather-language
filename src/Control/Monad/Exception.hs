@@ -3,27 +3,28 @@
 module Control.Monad.Exception where
 
 import Control.Monad.Parser
-import Plume.Syntax.Internal.Pretty.ANSI
 import Prettyprinter.Render.Terminal.Internal
 import Text.Megaparsec
-import System.IO.Pretty (ppFailure)
+import System.IO.Pretty (ppFailure, anBold, anCol, anItalic)
 import GHC.IO (unsafePerformIO)
 import System.Info (os, compilerVersion, arch)
 import Data.Text qualified as Text
 import Data.Version (showVersion)
+import Prettyprinter (Pretty (pretty), layoutPretty, defaultLayoutOptions, (<+>))
 
 class Throwable a where
   showError :: (HasCallStack) => a -> Text
-  default showError :: (ANSIPretty a) => a -> Text
+  default showError :: (Pretty a) => a -> Text
   showError e =
     renderStrict $
       layoutPretty defaultLayoutOptions $
-        ansiPretty e
+        pretty e
 
 instance Throwable Text where
   showError err =
-    toText $
-      anBold (anCol Red "[error]") <+> pretty err
+    renderStrict $
+      layoutPretty defaultLayoutOptions $
+        anBold (anCol Red "[error]") <+> pretty err
 
 instance Throwable ParsingError where
   showError = toText . errorBundlePretty

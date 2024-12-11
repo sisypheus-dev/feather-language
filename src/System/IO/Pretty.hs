@@ -1,17 +1,18 @@
 module System.IO.Pretty (
   printText,
-  ppPut,
-  ppPrint,
   ppSuccess,
   ppFailure,
   ppBuilding,
   parseError,
   printErrorFromString,
   printWarningFromString,
+
+  anCol,
+  anBold,
+  anItalic,
 ) where
 
 import Data.Text.IO
-import Plume.Syntax.Internal.Pretty.ANSI
 import Prettyprinter.Render.Terminal
 import Prelude hiding (print, putStrLn, readFile)
 import Error.Diagnose qualified as D
@@ -21,6 +22,7 @@ import Plume.Syntax.Concrete.Expression
 import System.Directory (doesFileExist)
 import qualified Data.Maybe as Mb
 import Text.Megaparsec.Pos (unPos, SourcePos (..))
+import Prettyprinter (Doc, annotate, (<+>), Pretty (pretty))
 
 instance D.HasHints Void String where
   hints _ = mempty
@@ -28,11 +30,14 @@ instance D.HasHints Void String where
 printText :: (ToText a) => a -> IO ()
 printText = putStrLn . toText
 
-ppPut :: (ANSIPretty a) => a -> IO ()
-ppPut = putDoc . ansiPretty
+anCol :: Color -> Doc AnsiStyle -> Doc AnsiStyle
+anCol c = annotate (color c)
 
-ppPrint :: (ANSIPretty a) => a -> IO ()
-ppPrint x = ppPut x >> putStrLn ""
+anBold :: Doc AnsiStyle -> Doc AnsiStyle
+anBold = annotate bold
+
+anItalic :: Doc AnsiStyle -> Doc AnsiStyle
+anItalic = annotate italicized
 
 ppSuccess :: Text -> IO ()
 ppSuccess x = putDoc (anBold (anCol Green "[success]") <> ":" <+> pretty x) >> putStrLn ""
